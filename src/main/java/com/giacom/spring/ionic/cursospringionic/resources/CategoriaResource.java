@@ -22,11 +22,7 @@ public class CategoriaResource {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findById(@PathVariable Integer id) {
-		try {
-			return ResponseEntity.ok(service.findById(id));
-		} catch (Exception e) {
-			return ResponseEntity.notFound().build();
-		}
+		return ResponseEntity.ok(service.findById(id));
 	}
 
 	@GetMapping
