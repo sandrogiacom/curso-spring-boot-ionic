@@ -1,5 +1,6 @@
 package com.giacom.spring.ionic.cursospringionic;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,20 @@ import com.giacom.spring.ionic.cursospringionic.domain.Cidade;
 import com.giacom.spring.ionic.cursospringionic.domain.Cliente;
 import com.giacom.spring.ionic.cursospringionic.domain.Endereco;
 import com.giacom.spring.ionic.cursospringionic.domain.Estado;
+import com.giacom.spring.ionic.cursospringionic.domain.Pagamento;
+import com.giacom.spring.ionic.cursospringionic.domain.PagamentoComBoleto;
+import com.giacom.spring.ionic.cursospringionic.domain.PagamentoComCartao;
+import com.giacom.spring.ionic.cursospringionic.domain.Pedido;
 import com.giacom.spring.ionic.cursospringionic.domain.Produto;
+import com.giacom.spring.ionic.cursospringionic.domain.enums.EstadoPagamento;
 import com.giacom.spring.ionic.cursospringionic.domain.enums.TipoCliente;
 import com.giacom.spring.ionic.cursospringionic.repositories.CategoriaRepository;
 import com.giacom.spring.ionic.cursospringionic.repositories.CidadeRepository;
 import com.giacom.spring.ionic.cursospringionic.repositories.ClienteRepository;
 import com.giacom.spring.ionic.cursospringionic.repositories.EnderecoRepository;
 import com.giacom.spring.ionic.cursospringionic.repositories.EstadoRepository;
+import com.giacom.spring.ionic.cursospringionic.repositories.PagamentoRepository;
+import com.giacom.spring.ionic.cursospringionic.repositories.PedidoRepository;
 import com.giacom.spring.ionic.cursospringionic.repositories.ProdutoRepository;
 
 @SpringBootApplication
@@ -41,6 +49,12 @@ public class CursoSpringIonicApplication implements CommandLineRunner {
 
     @Autowired
     private EnderecoRepository enderecoRepository;
+
+    @Autowired
+    private PedidoRepository pedidoRepository;
+
+    @Autowired
+    private PagamentoRepository pagamentoRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(CursoSpringIonicApplication.class, args);
@@ -88,6 +102,22 @@ public class CursoSpringIonicApplication implements CommandLineRunner {
 
         clienteRepository.save(cli1);
         enderecoRepository.saveAll(Arrays.asList(e1, e2));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+        Pedido ped1 = new Pedido(null, sdf.parse("30/09/2017 10:32"), cli1, e1);
+        Pedido ped2 = new Pedido(null, sdf.parse("10/10/2017 19:35"), cli1, e2);
+
+        Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+        ped1.setPagamento(pagto1);
+
+        Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/10/2017 00:00"), null);
+        ped2.setPagamento(pagto2);
+
+        cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+
+        pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+        pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
 
     }
 }
